@@ -85,9 +85,9 @@ const STEPS = [
 const TOTAL_STEPS = 36;
 
 function Illustration({type}) {
-  const base = {width:180,height:180,margin:"0 auto",position:"relative"};
-  const circle = {width:160,height:160,borderRadius:"50%",background:"linear-gradient(135deg,#e8faf0,#d1fae5)",position:"absolute",top:10,left:10};
-  const center = {position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",fontSize:80};
+  const base = {width:140,height:140,margin:"0 auto",position:"relative"};
+  const circle = {width:120,height:120,borderRadius:"50%",background:"linear-gradient(135deg,#e8faf0,#d1fae5)",position:"absolute",top:10,left:10};
+  const center = {position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",{fontSize:60};
   const icons = {
     "brain-lightning":<><div style={circle}/><div style={center}>🧠</div><div style={{position:"absolute",top:12,right:20,fontSize:40}}>⚡</div></>,
     "rocket":<><div style={circle}/><div style={center}>🚀</div></>,
@@ -170,15 +170,15 @@ function Landing({onStart}) {
 function InterstitialCard({step,stepIndex,onContinue,startTime}) {
   const inter=INTERSTITIALS[step.idx];
   return (
-    <div style={{minHeight:"100vh",background:"#f5f5f5",display:"flex",flexDirection:"column"}}>
+    <div style={{minHeight:"100vh",background:"#f5f5f5",display:"flex",flexDirection:"column",overflowY:"auto"}}>
       <QuizHeader stepIndex={stepIndex} startTime={startTime}/>
-      <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"24px 20px"}}>
+      <div style={{flex:1,display:"flex",flexDirection:"column",padding:"24px 20px 40px"}}>
         <div style={{background:"#fff",borderRadius:20,padding:"32px 24px",textAlign:"center",boxShadow:"0 2px 12px rgba(0,0,0,0.06)"}}>
           <Illustration type={inter.illustration}/>
           <h2 style={{fontSize:20,fontWeight:700,color:"#111",margin:"20px 0 12px",lineHeight:1.4}}>{inter.title}</h2>
           <p style={{fontSize:14,color:"#888",lineHeight:1.7,margin:0}}>{inter.desc}</p>
+          <button onClick={onContinue} style={{background:"#22c55e",color:"#fff",border:"none",borderRadius:16,padding:"18px",fontSize:18,fontWeight:700,cursor:"pointer",width:"100%",marginTop:24}}>Devam →</button>
         </div>
-        <button onClick={onContinue} style={{background:"#22c55e",color:"#fff",border:"none",borderRadius:16,padding:"18px",fontSize:18,fontWeight:700,cursor:"pointer",width:"100%",marginTop:24}}>Devam</button>
       </div>
     </div>
   );
