@@ -30,7 +30,8 @@ app.post("/api/payment", async (req, res) => {
     const merchant_oid = "IQ" + Date.now();
     const payment_amount = "5800";
     const currency = "TL";
-    const user_ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "1.2.3.4";
+    const rawIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "1.2.3.4";
+    const user_ip = rawIp.split(",")[0].trim().replace("::ffff:", "") || "1.2.3.4";
     const email_clean = email.trim();
     const user_basket = Buffer.from(JSON.stringify([["IQ Test Raporu", "58.00", 1]])).toString("base64");
     const merchant_ok_url = process.env.BASE_URL + "/odeme-basarili?iq=" + iq + "&name=" + encodeURIComponent(name) + "&email=" + encodeURIComponent(email);
