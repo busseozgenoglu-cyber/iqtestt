@@ -87,7 +87,7 @@ const TOTAL_STEPS = 36;
 function Illustration({type}) {
   const base = {width:140,height:140,margin:"0 auto",position:"relative"};
   const circle = {width:120,height:120,borderRadius:"50%",background:"linear-gradient(135deg,#e8faf0,#d1fae5)",position:"absolute",top:10,left:10};
-  const center = {position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",{fontSize:60};
+  const center = {position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",fontSize:60};
   const icons = {
     "brain-lightning":<><div style={circle}/><div style={center}>🧠</div><div style={{position:"absolute",top:12,right:20,fontSize:40}}>⚡</div></>,
     "rocket":<><div style={circle}/><div style={center}>🚀</div></>,
