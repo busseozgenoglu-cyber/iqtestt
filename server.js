@@ -28,11 +28,11 @@ app.post("/api/payment", async (req, res) => {
     if (!PAYTR_MERCHANT_ID) return res.status(500).json({ error: "PayTR bilgileri yapılandırılmamış." });
 
     const merchant_oid = "IQ" + Date.now();
-    const payment_amount = "5999";
+    const payment_amount = "5800";
     const currency = "TL";
     const user_ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "1.2.3.4";
     const email_clean = email.trim();
-    const user_basket = Buffer.from(JSON.stringify([["IQ Test Raporu", "59.99", 1]])).toString("base64");
+    const user_basket = Buffer.from(JSON.stringify([["IQ Test Raporu", "58.00", 1]])).toString("base64");
     const merchant_ok_url = process.env.BASE_URL + "/odeme-basarili?iq=" + iq + "&name=" + encodeURIComponent(name) + "&email=" + encodeURIComponent(email);
     const merchant_fail_url = process.env.BASE_URL + "/odeme-basarisiz";
     const no_installment = "0";
