@@ -47,7 +47,7 @@ app.post("/api/payment", async (req, res) => {
       merchant_id: PAYTR_MERCHANT_ID, user_ip, merchant_oid,
       email: email_clean, payment_amount, paytr_token, user_basket,
       debug_on: "1", no_installment, max_installment,
-      user_name: name.trim(), user_phone: phone.trim(), user_address: "Turkiye", user_basket_count: "1",
+      user_name: name.trim(), user_phone: phone.trim(), user_address: "Turkiye",
       merchant_ok_url, merchant_fail_url, currency, test_mode, lang: "tr",
     });
 
