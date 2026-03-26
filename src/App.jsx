@@ -422,8 +422,93 @@ function Analyzing({onDone}) {
   );
 }
 
+/* ─── IQ HESAPLAMA ─── */
+function calcIQ(correct, totalQ) {
+  const pct = correct / totalQ;
+  const base = Math.round(85 + pct * 60);
+  const noise = Math.floor(Math.random() * 7) - 3;
+  return Math.min(145, Math.max(85, base + noise));
+}
+function iqLabel(iq) {
+  if (iq >= 140) return "Deha Seviyesi";
+  if (iq >= 130) return "Çok Üstün Zeka";
+  if (iq >= 120) return "Üstün Zeka";
+  if (iq >= 110) return "Ortalamanın Üstü";
+  if (iq >= 100) return "Ortalama Üstü";
+  return "Ortalama";
+}
+
+/* ─── PAYTR ÖDEME MODAL ─── */
+function PaymentModal({iq, onClose}) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handlePay = async () => {
+    if (!name || !email || !phone) { setError("Tüm alanları doldurun."); return; }
+    setLoading(true); setError("");
+    try {
+      const res = await fetch("/api/payment", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ name, email, phone, iq })
+      });
+      const data = await res.json();
+      if (data.token) {
+        window.location.href = `https://www.paytr.com/odeme/guvenli/${data.token}`;
+      } else {
+        setError(data.error || "Ödeme başlatılamadı.");
+      }
+    } catch(e) {
+      setError("Sunucu hatası. Lütfen tekrar deneyin.");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",display:"flex",alignItems:"flex-end",justifyContent:"center",zIndex:1000}}>
+      <div style={{background:"#fff",borderRadius:"24px 24px 0 0",padding:"28px 24px 40px",width:"100%",maxWidth:480}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+          <h3 style={{fontSize:20,fontWeight:800,margin:0}}>IQ Raporunu Al</h3>
+          <button onClick={onClose} style={{background:"none",border:"none",fontSize:24,cursor:"pointer",color:"#999"}}>×</button>
+        </div>
+        <div style={{background:"#f0fdf4",borderRadius:14,padding:"12px 16px",marginBottom:20,display:"flex",gap:10,alignItems:"center"}}>
+          <span style={{fontSize:32}}>🧠</span>
+          <div>
+            <div style={{fontSize:15,fontWeight:700,color:"#111"}}>IQ {iq} — {iqLabel(iq)}</div>
+            <div style={{fontSize:13,color:"#666"}}>Detaylı raporunuz e-posta ile gönderilecek</div>
+          </div>
+        </div>
+        {[["Ad Soyad", name, setName, "text"],["E-posta", email, setEmail, "email"],["Telefon", phone, setPhone, "tel"]].map(([label,val,setter,type])=>(
+          <div key={label} style={{marginBottom:12}}>
+            <label style={{fontSize:13,fontWeight:600,color:"#555",display:"block",marginBottom:4}}>{label}</label>
+            <input type={type} value={val} onChange={e=>setter(e.target.value)}
+              style={{width:"100%",padding:"12px 14px",borderRadius:12,border:"2px solid #e5e7eb",fontSize:15,outline:"none",boxSizing:"border-box"}}
+              placeholder={label}/>
+          </div>
+        ))}
+        {error && <p style={{color:"#ef4444",fontSize:13,margin:"0 0 12px"}}>{error}</p>}
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+          <span style={{fontSize:14,color:"#999",textDecoration:"line-through"}}>899,99 ₺</span>
+          <span style={{fontSize:22,fontWeight:800,color:"#111"}}>59,99 ₺</span>
+        </div>
+        <button onClick={handlePay} disabled={loading}
+          style={{display:"block",width:"100%",background:loading?"#9ca3af":"linear-gradient(135deg,#22c55e,#16a34a)",color:"#fff",border:"none",borderRadius:14,padding:"16px",fontSize:17,fontWeight:700,cursor:loading?"not-allowed":"pointer"}}>
+          {loading ? "Yükleniyor..." : "Güvenli Öde — 59,99 ₺"}
+        </button>
+        <p style={{fontSize:12,color:"#999",textAlign:"center",margin:"10px 0 0"}}>🔒 256-bit SSL şifreleme · 7 gün iade garantisi</p>
+      </div>
+    </div>
+  );
+}
+
 /* ─── RESULTS ─── */
-function Results() {
+function Results({correct, totalQ}) {
+  const [showModal, setShowModal] = useState(false);
+  const iq = useRef(calcIQ(correct, totalQ)).current;
+  const label = iqLabel(iq);
   return (
     <div style={{background:"#fff",minHeight:"100vh"}}>
       <SocialProofBar/>
@@ -433,14 +518,14 @@ function Results() {
         <p style={{fontSize:18,fontWeight:700,textAlign:"center",margin:"0 0 28px",lineHeight:1.4}}>
           <span style={{color:"#22c55e"}}>Nasıl Performans<br/>Gösterdiğinizi Görün!</span>
         </p>
-        <div style={{display:"flex",justifyContent:"center",gap:10,marginBottom:28}}>
+        <div style={{display:"flex",justifyContent:"center",gap:10,marginBottom:20}}>
           <div style={{background:"#fff",border:"2px solid #e5e7eb",borderRadius:16,padding:"10px 8px",textAlign:"center",width:105}}>
             <div style={{fontSize:15,fontWeight:700,color:"#111"}}>IQ 114</div>
             <div style={{width:70,height:70,borderRadius:12,background:"#f3f4f6",margin:"8px auto",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:42}}>👩</span></div>
             <div style={{fontSize:11,fontWeight:600,color:"#555"}}>Marilyn Monroe</div>
           </div>
           <div style={{background:"linear-gradient(180deg,#22c55e,#16a34a)",borderRadius:16,padding:"10px 8px",textAlign:"center",width:105,transform:"scale(1.06)",boxShadow:"0 4px 20px rgba(34,197,94,0.35)"}}>
-            <div style={{fontSize:15,fontWeight:700,color:"#fff"}}>IQ ???</div>
+            <div style={{fontSize:15,fontWeight:700,color:"#fff"}}>IQ {iq}</div>
             <div style={{width:70,height:70,borderRadius:12,background:"rgba(255,255,255,0.2)",margin:"8px auto",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:42}}>🧑‍💼</span></div>
             <div style={{fontSize:12,fontWeight:700,color:"#fff"}}>Siz</div>
           </div>
@@ -450,7 +535,12 @@ function Results() {
             <div style={{fontSize:11,fontWeight:600,color:"#555"}}>Albert Einstein</div>
           </div>
         </div>
-        <button style={{display:"block",width:"100%",background:"#22c55e",color:"#fff",border:"none",borderRadius:16,padding:"18px",fontSize:18,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(34,197,94,0.3)",marginBottom:40}}>Tam IQ Raporunu İncele</button>
+        <div style={{background:"#f0fdf4",borderRadius:16,padding:"16px 20px",marginBottom:24,textAlign:"center"}}>
+          <div style={{fontSize:48,fontWeight:900,color:"#16a34a",lineHeight:1}}>{iq}</div>
+          <div style={{fontSize:16,fontWeight:700,color:"#15803d",marginTop:4}}>{label}</div>
+          <div style={{fontSize:13,color:"#666",marginTop:6}}>Türkiye genelinde kullanıcıların %{Math.round((iq-85)/60*100)}'inden yüksek skor</div>
+        </div>
+        <button onClick={()=>setShowModal(true)} style={{display:"block",width:"100%",background:"#22c55e",color:"#fff",border:"none",borderRadius:16,padding:"18px",fontSize:18,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(34,197,94,0.3)",marginBottom:40}}>Tam IQ Raporunu İncele</button>
 
         <h2 style={{fontSize:22,fontWeight:800,color:"#111",textAlign:"center",margin:"0 0 20px",lineHeight:1.3}}>Testora IQ'yu <span style={{color:"#22c55e"}}>7 gün</span> boyunca deneyin</h2>
         <div style={{border:"2px solid #e5e7eb",borderRadius:20,padding:20,marginBottom:24}}>
@@ -474,7 +564,7 @@ function Results() {
               <span style={{fontSize:14,color:"#333",lineHeight:1.5}}>{f}</span>
             </div>
           ))}
-          <button style={{display:"block",width:"100%",background:"linear-gradient(135deg,#22c55e,#16a34a)",color:"#fff",border:"none",borderRadius:14,padding:"16px",fontSize:17,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(34,197,94,0.25)",marginTop:8}}>Planı Başlat — 59,99 ₺</button>
+          <button onClick={()=>setShowModal(true)} style={{display:"block",width:"100%",background:"linear-gradient(135deg,#22c55e,#16a34a)",color:"#fff",border:"none",borderRadius:14,padding:"16px",fontSize:17,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(34,197,94,0.25)",marginTop:8}}>Planı Başlat — 59,99 ₺</button>
           <p style={{fontSize:12,color:"#999",textAlign:"center",margin:"12px 0 0"}}>7 gün içinde istediğiniz zaman iptal edebilirsiniz</p>
         </div>
 
@@ -519,6 +609,7 @@ function Results() {
           <p style={{fontSize:11,color:"#bbb",margin:0}}>Copyright © 2025</p>
         </div>
       </div>
+      {showModal && <PaymentModal iq={iq} onClose={()=>setShowModal(false)}/>}
     </div>
   );
 }
@@ -529,6 +620,7 @@ export default function App() {
   const [si,setSi]=useState(0);
   const [correct,setCorrect]=useState(0);
   const [startTime]=useState(Date.now());
+  const totalQ = STEPS.filter(s=>s.type==="q").length;
 
   const advance=()=>{if(si+1>=STEPS.length)setPage("analyzing");else setSi(i=>i+1);};
   const handleAnswer=useCallback((ok)=>{if(ok)setCorrect(c=>c+1);advance();},[si]);
@@ -540,7 +632,7 @@ export default function App() {
       {page==="quiz"&&step.type==="inter"&&<InterstitialCard step={step} stepIndex={si} onContinue={advance} startTime={startTime}/>}
       {page==="quiz"&&step.type==="q"&&<QuizQuestion step={step} stepIndex={si} onAnswer={handleAnswer} startTime={startTime}/>}
       {page==="analyzing"&&<Analyzing onDone={()=>setPage("results")}/>}
-      {page==="results"&&<Results/>}
+      {page==="results"&&<Results correct={correct} totalQ={totalQ}/>}
     </div>
   );
 }
