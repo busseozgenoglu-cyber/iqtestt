@@ -467,7 +467,69 @@ function Results({iq,correct,total}) {
   );
 }
 
+/* ─── ÖDEME BAŞARILI SAYFASI ─── */
+function OdemeBasarili() {
+  const params = new URLSearchParams(window.location.search);
+  const iq = parseInt(params.get("iq")) || 105;
+  const name = params.get("name") || "";
+  const {label, color} = getIQLabel(iq);
+  const percentile = getPercentile(iq);
+
+  return (
+    <div style={{minHeight:"100vh",background:"linear-gradient(180deg,#f0fdf4,#fff)",display:"flex",flexDirection:"column",alignItems:"center",padding:"40px 24px",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"}}>
+      <div style={{fontSize:64,marginBottom:16}}>🎉</div>
+      <h1 style={{fontSize:26,fontWeight:900,color:"#111",textAlign:"center",margin:"0 0 8px"}}>Ödeme Onaylandı!</h1>
+      {name && <p style={{fontSize:16,color:"#555",margin:"0 0 32px"}}>Tebrikler, <b>{name}</b>!</p>}
+
+      {/* IQ Kutusu */}
+      <div style={{background:"linear-gradient(135deg,#f0fdf4,#dcfce7)",borderRadius:24,padding:32,textAlign:"center",marginBottom:24,border:"2px solid #bbf7d0",width:"100%",maxWidth:380}}>
+        <div style={{fontSize:15,color:"#666",marginBottom:4}}>IQ Puanınız</div>
+        <div style={{fontSize:96,fontWeight:900,color,lineHeight:1,margin:"0 0 8px"}}>{iq}</div>
+        <div style={{display:"inline-block",background:color,color:"#fff",borderRadius:20,padding:"6px 20px",fontSize:15,fontWeight:700}}>{label}</div>
+      </div>
+
+      {/* İstatistikler */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:24,width:"100%",maxWidth:380}}>
+        {[
+          {label:"Yüzdelik Dilim",value:`%${percentile}`,icon:"📊"},
+          {label:"Zeka Seviyesi",value:label,icon:"🧠"},
+          {label:"Durum",value:"Tamamlandı",icon:"✅"},
+          {label:"Rapor",value:"Hazır",icon:"📋"},
+        ].map((s,i)=>(
+          <div key={i} style={{background:"#f9fafb",borderRadius:16,padding:"14px 16px",textAlign:"center"}}>
+            <div style={{fontSize:22,marginBottom:4}}>{s.icon}</div>
+            <div style={{fontSize:16,fontWeight:800,color:"#111"}}>{s.value}</div>
+            <div style={{fontSize:12,color:"#888"}}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Analiz */}
+      <div style={{background:"#fff",borderRadius:20,padding:"20px 18px",border:"1px solid #e5e7eb",width:"100%",maxWidth:380,marginBottom:24}}>
+        <h3 style={{fontSize:16,fontWeight:800,margin:"0 0 14px",color:"#111"}}>Kişisel Analiz</h3>
+        {iq >= 120 ? (
+          <p style={{fontSize:14,color:"#555",lineHeight:1.7,margin:0}}>Zeka puanınız <b style={{color}}>üst %{100-percentile}</b>'lik dilimde yer alıyor. Güçlü mantık, analitik düşünce ve hızlı problem çözme becerileriniz öne çıkıyor.</p>
+        ) : iq >= 110 ? (
+          <p style={{fontSize:14,color:"#555",lineHeight:1.7,margin:0}}>Ortalamanın üstünde bir IQ'ya sahipsiniz. Türkiye genelinin <b style={{color}}>%{percentile}</b>'inden daha iyi bir performans sergilediniZ.</p>
+        ) : (
+          <p style={{fontSize:14,color:"#555",lineHeight:1.7,margin:0}}>Türkiye genelinin <b style={{color}}>%{percentile}</b>'inden daha iyi performans sergilediniZ. Düzenli zihinsel egzersizlerle puanınızı artırabilirsiniz.</p>
+        )}
+      </div>
+
+      <button onClick={()=>window.location.href="/"} style={{background:"#111",color:"#fff",border:"none",borderRadius:14,padding:"16px 40px",fontSize:16,fontWeight:700,cursor:"pointer"}}>
+        Ana Sayfaya Dön
+      </button>
+      <p style={{fontSize:11,color:"#bbb",margin:"20px 0 0",textAlign:"center"}}>Copyright © 2025 Testora IQ</p>
+    </div>
+  );
+}
+
 export default function App() {
+  // URL kontrolü — /odeme-basarili sayfası
+  if (window.location.pathname === "/odeme-basarili") {
+    return <OdemeBasarili />;
+  }
+
   const [page,setPage]=useState("landing");
   const [si,setSi]=useState(0);
   const [correct,setCorrect]=useState(0);
