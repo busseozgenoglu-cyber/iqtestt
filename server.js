@@ -117,11 +117,21 @@ app.post("/api/payment", async (req, res) => {
 app.post("/api/paytr-notification", async (req, res) => {
   const { merchant_oid, status, total_amount, hash } = req.body;
 
-  // ✅ DÜZELTME: Notification hash doğrulaması da düzeltildi
+  const hashInput = merchant_oid + PAYTR_MERCHANT_SALT + status;
   const check = crypto
     .createHmac("sha256", PAYTR_MERCHANT_KEY)
-    .update(merchant_oid + PAYTR_MERCHANT_SALT + status)
+    .update(hashInput)
     .digest("base64");
+
+  console.log("=== PAYTR NOTIFICATION DEBUG ===");
+  console.log("merchant_oid:", merchant_oid);
+  console.log("status:", status);
+  console.log("hash_input:", hashInput);
+  console.log("calculated:", check);
+  console.log("received:", hash);
+  console.log("match:", check === hash);
+  console.log("KEY length:", PAYTR_MERCHANT_KEY.length);
+  console.log("SALT length:", PAYTR_MERCHANT_SALT.length);
 
   if (check !== hash) return res.send("PAYTR_HASH_MISMATCH");
 
